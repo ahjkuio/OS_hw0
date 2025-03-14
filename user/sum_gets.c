@@ -11,7 +11,7 @@ int main(void) {
     // Получаем строку
     s = gets(buf, MAXLEN);
     if (s == 0) {
-        printf("Error: Failed to read input\n");
+        fprintf(2, "Error: Failed to read input\n");
         exit(1);
     }
 
@@ -24,7 +24,7 @@ int main(void) {
     // Находим пробел
     char *space = strchr(buf, ' ');
     if (space == 0) {
-        printf("Error: Invalid format (need two numbers separated by space)\n");
+        fprintf(2, "Error: Invalid format (need two numbers separated by space)\n");
         exit(1);
     }
 

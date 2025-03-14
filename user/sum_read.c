@@ -11,8 +11,15 @@ int safe_read(char *buf, int maxlen) {
     
     while (n < maxlen - 1) {
         r = read(0, p, 1);
-        if (r <= 0) {
-            break;
+        if (r < 0) {
+            // Ошибка чтения
+            fprintf(2, "Error: read error\n");
+            return -1;
+        }
+        if (r == 0) {
+            // Конец файла - добавляем нулевой символ
+            *p = '\0';
+            return n;
         }
         if (*p == '\n') {
             *p = '\0';
@@ -24,7 +31,7 @@ int safe_read(char *buf, int maxlen) {
     
     if (n == maxlen - 1) {
         buf[n] = '\0';
-        printf("Warning: Input truncated\n");
+        fprintf(2, "Warning: Input truncated\n");
     }
     
     return n;
@@ -38,8 +45,13 @@ int main(void) {
     printf("Enter two numbers separated by space: ");
     len = safe_read(buf, MAXLEN);
     
-    if (len <= 0) {
-        printf("Error: Failed to read input\n");
+    if (len < 0) {
+        // Ошибка чтения
+        exit(1);
+    }
+    
+    if (len == 0) {
+        fprintf(2, "Error: Empty input (EOF)\n");
         exit(1);
     }
 
@@ -49,7 +61,7 @@ int main(void) {
     // Находим пробел
     char *space = strchr(buf, ' ');
     if (space == 0) {
-        printf("Error: Invalid format (need two numbers separated by space)\n");
+        fprintf(2, "Error: Invalid format (need two numbers separated by space)\n");
         exit(1);
     }
 
@@ -62,7 +74,7 @@ int main(void) {
     
     // Проверяем, что строки действительно содержат числа
     if (strlen(buf) == 0 || strlen(space + 1) == 0) {
-        printf("Error: Empty number\n");
+        fprintf(2, "Error: Empty number\n");
         exit(1);
     }
     

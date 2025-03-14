@@ -6,9 +6,11 @@ main:
     addi sp, sp, -16
     sd ra, 8(sp)
 
-    // Выделяем буфер для строки
+    // Выделяем буфер для строки (ограничиваем размер)
+    li a2, 256      // Максимальный размер буфера
     addi sp, sp, -256
     mv a0, sp        // Буфер для gets
+    mv a1, a2        // Передаём размер буфера
     call gets
 
     // Проверяем результат gets
@@ -45,19 +47,22 @@ found_space:
 
     // Успешное завершение
     li a0, 0
-    j exit
+    j exit_prog
 
 error:
-    la a0, error_msg
-    call printf
+    // Используем файловый дескриптор 2 для stderr
+    li a0, 2
+    la a1, error_msg
+    call fprintf
     li a0, 1
 
-exit:
-    // Восстанавливаем стек и возвращаемся
+exit_prog:
+    // Восстанавливаем стек
     addi sp, sp, 256
     ld ra, 8(sp)
     addi sp, sp, 16
-    ret
+    // Вызываем системный вызов exit вместо ret
+    call exit
 
 .section .data
 fmt:
